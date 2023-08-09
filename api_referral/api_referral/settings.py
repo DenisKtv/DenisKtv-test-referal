@@ -19,7 +19,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'referal',
+    'referral',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

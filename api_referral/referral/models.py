@@ -11,7 +11,7 @@ class UserProfile(models.Model):
         max_length=15,
         unique=True
     )
-    nickname = models.CharField(
+    username = models.CharField(
         'Ник',
         max_length=30,
         unique=True
@@ -37,8 +37,12 @@ class UserProfile(models.Model):
 
     def clean(self):
         forbidden_characters = r'[!"№%:,.;()[]{}@#$%^&*?/\\|]'
-        if re.search(forbidden_characters, self.nickname):
-            raise ValidationError('Никнейм содержит недопустимые символы.')
+        if re.search(forbidden_characters, self.username):
+            raise ValidationError('Логин содержит недопустимые символы.')
+
+    class Meta:
+        verbose_name = 'Профиль'
+        verbose_name_plural = 'Профили'
 
     def __str__(self):
-        return self.nickname
+        return self.username
