@@ -19,7 +19,7 @@
         </form>
         <div class="button-container">
             <button onclick="getInviteCode()">Мой инвайт-код</button>
-            <form action="{% url 'referrals' %}" method="get" target="_blank"> <!-- Форма для перехода на страницу рефералов -->
+            <form action="{% url 'referrals' %}" method="get" target="_blank">
                 <button type="submit">Рефералы</button>
             </form>
         </div>
@@ -32,6 +32,10 @@
             var csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
             var url = document.querySelector('[data-url]').getAttribute('data-url');
 
+            if (!phone_number.trim() || !invite_code.trim()) {
+                alert('Пожалуйста, введите номер телефона и реферральный код.');
+                return;
+            }
             fetch(url, {
                 method: 'POST',
                 headers: {
