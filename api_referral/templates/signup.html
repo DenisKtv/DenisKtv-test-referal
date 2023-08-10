@@ -85,10 +85,11 @@
                     return response.json().then(data => ({ status, data }));
                 })
                 .then(({ status, data }) => {
-                    if (status === 201) {
-                        alert('Регистрация успешно пройдена!');
-                    } else if (status === 200) {
-                        alert('Успешная авторизация!');
+                    if (status === 201 || status === 200) {
+                        alert(status === 201 ? 'Регистрация успешно пройдена!' : 'Успешная авторизация!');
+                        setTimeout(function() {
+                            window.location.href = "{% url 'user_profile' %}"; 
+                        }, 1000);
                     } else if (status === 400 && data.message === "Код верификации неверен") {
                         alert('Код верификации неверен');
                     } else {
