@@ -59,7 +59,7 @@ class UserProfileSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {'message': 'Введенный '
                  'реферральный код не существует.'}
-                )
+            )
 
         return data
 
