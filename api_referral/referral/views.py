@@ -1,14 +1,18 @@
-import time
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.cache import cache
-from .models import UserProfile
+from django.shortcuts import render
 import random
-from .serializers import SignUpSerializer, SignInSerializer
+import time
+from .models import UserProfile
+from .serializers import (SignUpSerializer, UserProfileSerializer,
+                          ReferralSerializer)
+from .verification_service import VerificationService
+from drf_yasg.utils import swagger_auto_schema
 
 
-class VerificationView(APIView):
+class SignUpView(APIView):
     def generate_verification_code(self, phone_number):
         verification_code = random.randint(1000, 9999)
         cache.set(phone_number, verification_code, timeout=90)
@@ -17,94 +21,138 @@ class VerificationView(APIView):
 
     def check_verification_code(self, phone_number, verification_code):
         cached_code = cache.get(phone_number)
-        return cached_code == int(verification_code)
+        return cached_code == verification_code
 
-    def check_phone_number_existence(self, phone_number, should_exist):
-        exists = UserProfile.objects.filter(phone_number=phone_number).exists()
-        return exists if should_exist else not exists
-
-
-class SignUpView(VerificationView):
-    serializer_class = SignUpSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+    @swagger_auto_schema(
+        operation_description='Получает номер телефона. Если это первый '
+                              'запрос, то сохраняет в БД. Если нет, то '
+                              'авторизует пользователя.',
+        request_body=SignUpSerializer,
+        responses={200: 'Успешно'}
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = SignUpSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-        phone_number = request.data.get('phone_number')
+        phone_number = serializer.validated_data['phone_number']
         verification_code = request.data.get('verification_code')
-        username = request.data.get('username')
-
-        if not self.check_phone_number_existence(phone_number, False):
-            return Response(
-                {"message": "Телефон уже зарегистрирован"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if UserProfile.objects.filter(username=username).exists():
-            return Response(
-                {"message": "Логин уже зарегистрирован"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
 
         if verification_code is None:
-            verification_code = self.generate_verification_code(phone_number)
+            verification_code = VerificationService.generate_verification_code(
+                phone_number
+            )
             return Response(
                 {"verification_code": verification_code},
                 status=status.HTTP_200_OK
             )
 
-        if not self.check_verification_code(phone_number, verification_code):
+        if not VerificationService.check_verification_code(
+            phone_number, verification_code
+        ):
             return Response(
                 {"message": "Код верификации неверен"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        user_profile = UserProfile(
-            phone_number=phone_number, username=username
+        user_profile, created = UserProfile.objects.get_or_create(
+            phone_number=phone_number
         )
-        user_profile.generate_invite_code()
+        if created:
+            user_profile.generate_invite_code()
+            user_profile.save()
+            message = 'Регистрация успешно пройдена'
+        else:
+            message = 'Успешная авторизация'
+
+        return Response(
+            {'message': message},
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'signup.html')
+
+
+class UserProfileView(APIView):
+
+    @swagger_auto_schema(
+        operation_description="Активирует инвайт-код.",
+        request_body=UserProfileSerializer,
+        responses={200: "Реферральный код успешно добавлен"}
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = UserProfileSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        phone_number = serializer.validated_data['phone_number']
+        invite_code = serializer.validated_data['invite_code']
+
+        user_profile = UserProfile.objects.get(phone_number=phone_number)
+        referrer_profile = UserProfile.objects.get(invite_code=invite_code)
+
+        user_profile.entered_invite_code = invite_code
+        user_profile.activated_invite_code = referrer_profile
         user_profile.save()
 
         return Response(
-            {"message": "Регистрация успешно пройдена"},
-            status=status.HTTP_201_CREATED
+            {'message': 'Реферральный код успешно добавлен'},
+            status=status.HTTP_200_OK
         )
 
-
-class LogInView(VerificationView):
-    serializer_class = SignInSerializer
-
-    def post(self, request):
-        phone_number = request.data.get('phone_number')
-        verification_code = request.data.get('verification_code')
-
-        if not self.check_phone_number_existence(phone_number, True):
+    @swagger_auto_schema(
+        operation_description="Выводит личный инвайт-код.",
+        responses={200: UserProfileSerializer}
+    )
+    def get(self, request, *args, **kwargs):
+        phone_number = request.query_params.get('phone_number')
+        if phone_number:
+            user_profile = UserProfile.objects.filter(
+                phone_number=phone_number
+            ).first()
+            if not user_profile:
+                return Response(
+                    {'message': 'Такой номер не зарегистрирован'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             return Response(
-                {"message": "Телефон не зарегистрирован"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if verification_code is None:
-            verification_code = self.generate_verification_code(phone_number)
-            return Response(
-                {"verification_code": verification_code},
+                {'invite_code': user_profile.invite_code},
                 status=status.HTTP_200_OK
             )
 
-        if not self.check_verification_code(phone_number, verification_code):
+        # Если номер телефона не предоставлен, отобразить HTML-шаблон
+        return render(request, 'profile.html')
+
+
+class ReferralListView(APIView):
+
+    @swagger_auto_schema(
+        operation_description='Выводит всех рефералов, активировавших ваш '
+                              'инвайт-код.',
+        responses={200: ReferralSerializer}
+    )
+    def get(self, request, *args, **kwargs):
+        phone_number = request.GET.get('phone_number')
+
+        if not phone_number:
+            return render(request, 'referrals.html')
+
+        user_profile = UserProfile.objects.filter(
+            phone_number=phone_number
+        ).first()
+        if not user_profile:
             return Response(
-                {"message": "Код верификации неверен"},
-                status=status.HTTP_400_BAD_REQUEST
+                {'message': 'Такой номер не зарегистрирован'},
+                status=status.HTTP_404_NOT_FOUND
             )
-
-        # Здесь можно создать и вернуть токен, если это необходимо
-        # ...
-
-        return Response(
-            {"message": "Авторизация успешна"},
-            status=status.HTTP_200_OK
+        referrals = UserProfile.objects.filter(
+            activated_invite_code=user_profile
         )
+        serializer = ReferralSerializer(referrals, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

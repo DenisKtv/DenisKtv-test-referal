@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+    <div class="container">
+        <form id="activate-form" action="" method="post">
+            <label for="phone_number">Номер телефона:</label>
+            <input type="text" id="phone_number" name="phone_number" required>
+            <label for="invite_code">Инвайт-код:</label>
+            <input type="text" id="invite_code" name="invite_code" required>
+            <button type="button" onclick="activateInviteCode()" data-url="{% url 'user_profile' %}">Активировать</button>
+        </form>
+        <div class="button-container">
+            <button onclick="getInviteCode()">Мой инвайт-код</button>
+            <form action="{% url 'referrals' %}" method="get" target="_blank"> <!-- Форма для перехода на страницу рефералов -->
+                <button type="submit">Рефералы</button>
+            </form>
+        </div>
+        <div id="invite-code-display"></div>
+    </div>
+    <script>
+        function activateInviteCode() {
+            var phone_number = document.querySelector('#phone_number').value;
+            var invite_code = document.querySelector('#invite_code').value;
+            var csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+            var url = document.querySelector('[data-url]').getAttribute('data-url');
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ phone_number: phone_number, invite_code: invite_code }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    if (data.message === 'Такой номер не зарегистрирован') {
+                        alert('Такой номер телефона не зарегистрирован. Пожалуйста, проверьте введенный номер.');
+                    } else if (data.message === 'Вы не можете использовать свой собственный реферральный код.') {
+                        alert('Вы не можете использовать свой собственный реферральный код. Пожалуйста, введите другой код.');
+                    } else if (data.message === 'Введенный реферральный код не существует.') {
+                        alert('Введенный реферральный код не существует. Пожалуйста, проверьте введенный код.');
+                    } else {
+                        alert(data.message);
+                    }
+                } else {
+                    alert('Реферральный код успешно добавлен');
+                }
+            })
+            .catch(error => {
+                console.error('Произошла ошибка при выполнении запроса:', error);
+                alert('Произошла ошибка при выполнении запроса');
+            });
+        }
+
+
+
+        function getInviteCode() {
+            var phone_number = prompt("Введите свой номер телефона:");
+            if (phone_number) {
+                fetch('{% url "user_profile" %}?phone_number=' + phone_number)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.invite_code) {
+                        document.querySelector('#invite-code-display').textContent = "Ваш инвайт-код: " + data.invite_code;
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Произошла ошибка при выполнении запроса:', error);
+                    alert('Произошла ошибка при выполнении запроса');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

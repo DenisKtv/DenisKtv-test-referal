@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+</head>
+<body>
+    <form action="{% url 'signup' %}" method="post">
+        {% csrf_token %}
+        <label for="phone_number">Номер телефона:</label>
+        <input type="text" id="phone_number" name="phone_number" required>
+        <br>
+        <div id="verification-section">
+            <label for="verification_code">Код верификации:</label>
+            <input type="text" id="verification_code" name="verification_code">
+        </div>
+        <button type="submit">Отправить</button>
+    </form>
+    <div id="verification-popup">
+        <p>Ваше SMS: <span id="sms-code"></span></p>
+        <p id="timer">90</p>
+    </div>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+    
+            var phone_number = document.querySelector('#phone_number').value;
+            var verification_code = parseInt(document.querySelector('#verification_code').value, 10);
+    
+            // Проверка валидности номера телефона
+            var phonePattern = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s./0-9]*$/;
+            if (!phone_number.match(phonePattern)) {
+                alert('Пожалуйста, введите действительный номер телефона.');
+                return;
+            }
+    
+            if (!verification_code) {
+                fetch('{% url "signup" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                    },
+                    body: JSON.stringify({ phone_number: phone_number }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var verificationPopup = document.querySelector('#verification-popup');
+                    var verificationSection = document.querySelector('#verification-section');
+                    var timerElement = document.querySelector('#timer');
+                    var smsCodeElement = document.querySelector('#sms-code');
+    
+                    verificationPopup.style.display = 'block';
+                    verificationSection.style.display = 'block';
+    
+                    smsCodeElement.textContent = data.verification_code;
+    
+                    var timeRemaining = 90;
+                    timerElement.textContent = timeRemaining;
+    
+                    var timerInterval = setInterval(function() {
+                        timeRemaining--;
+                        timerElement.textContent = timeRemaining;
+                        if (timeRemaining < 0) {
+                            clearInterval(timerInterval);
+                            alert('Время ожидания истекло. Пожалуйста, отправьте свой номер телефона еще раз.');
+                            verificationPopup.style.display = 'none';
+                        }
+                    }, 1000);
+                });
+            } else {
+                fetch('{% url "signup" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                    },
+                    body: JSON.stringify({ phone_number: phone_number, verification_code: verification_code }),
+                })
+                .then(response => {
+                    const status = response.status;
+                    return response.json().then(data => ({ status, data }));
+                })
+                .then(({ status, data }) => {
+                    if (status === 201) {
+                        alert('Регистрация успешно пройдена!');
+                    } else if (status === 200) {
+                        alert('Успешная авторизация!');
+                    } else if (status === 400 && data.message === "Код верификации неверен") {
+                        alert('Код верификации неверен');
+                    } else {
+                        alert(JSON.stringify(data));
+                    }
+                });
+            }
+        });
+    </script>
+    
+</body>
+</html>

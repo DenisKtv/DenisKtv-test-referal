@@ -1,20 +1,14 @@
 import random
-import re
 import string
 from django.db import models
-from django.core.exceptions import ValidationError
 
 
 class UserProfile(models.Model):
     phone_number = models.CharField(
         'Номер телефона',
-        max_length=15,
-        unique=True
-    )
-    username = models.CharField(
-        'Ник',
-        max_length=30,
-        unique=True
+        unique=True,
+        max_length=20,
+        null=False
     )
     invite_code = models.CharField(
         'Инвайт-код',
@@ -29,20 +23,25 @@ class UserProfile(models.Model):
         blank=True,
         related_name='referrals'
     )
+    entered_invite_code = models.CharField(
+        'Введенный инвайт-код',
+        max_length=6,
+        null=True,
+        blank=True
+    )
 
     def generate_invite_code(self):
-        self.invite_code = ''.join(
-            random.choices(string.ascii_letters + string.digits, k=6)
-        )
-
-    def clean(self):
-        forbidden_characters = r'[!"№%:,.;()[]{}@#$%^&*?/\\|]'
-        if re.search(forbidden_characters, self.username):
-            raise ValidationError('Логин содержит недопустимые символы.')
+        while True:
+            code = ''.join(
+                random.choices(string.ascii_letters + string.digits, k=6)
+            )
+            if not UserProfile.objects.filter(invite_code=code).exists():
+                self.invite_code = code
+                break
 
     class Meta:
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'
 
     def __str__(self):
-        return self.username
+        return self.phone_number

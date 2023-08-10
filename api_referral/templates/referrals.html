@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список рефералов</title>
+    <link rel="stylesheet" href="{% static 'css/referrals.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="button-container">
+            <button onclick="getReferrals()">Получить список рефералов</button>
+            <form action="{% url 'user_profile' %}" target="_blank"><button>Профиль</button></form>
+        </div>
+        <h3 id="referral-header"></h3> <!-- Заголовок для списка рефералов -->
+        <div id="referrals"></div>
+    </div>
+    <script>
+        function getReferrals() {
+            var phone_number = prompt("Введите свой номер телефона:");
+            if (phone_number) {
+                fetch('{% url "referrals" %}?phone_number=' + phone_number)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                    } else {
+                        var referralHeader = document.querySelector('#referral-header');
+                        referralHeader.textContent = "Список ваших рефералов: всего " + data.length; // Заголовок с числом рефералов
+
+                        var referralListDiv = document.querySelector('#referrals');
+                        referralListDiv.innerHTML = '';
+                        data.forEach((referral, index) => {
+                            var referralDiv = document.createElement('div');
+                            referralDiv.textContent = (index + 1) + ". Телефон: " + referral.phone_number; // Нумерация рефералов
+                            referralListDiv.appendChild(referralDiv);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Произошла ошибка при выполнении запроса:', error);
+                    alert('Произошла ошибка при выполнении запроса');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
