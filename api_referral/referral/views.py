@@ -124,11 +124,13 @@ class UserProfileView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             return Response(
-                {'invite_code': user_profile.invite_code},
+                {
+                    'invite_code': user_profile.invite_code,
+                    'entered_invite_code': user_profile.entered_invite_code
+                },
                 status=status.HTTP_200_OK
             )
 
-        # Если номер телефона не предоставлен, отобразить HTML-шаблон
         return render(request, 'profile.html')
 
 

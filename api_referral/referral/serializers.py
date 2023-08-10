@@ -31,6 +31,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=16)
     invite_code = serializers.CharField(max_length=6, required=True)
+    entered_invite_code = serializers.CharField(max_length=6, required=False)
 
     def validate(self, data):
         phone_number = data['phone_number']

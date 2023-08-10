@@ -75,7 +75,11 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.invite_code) {
-                        document.querySelector('#invite-code-display').textContent = "Ваш инвайт-код: " + data.invite_code;
+                        let inviteText = "Ваш инвайт-код: " + data.invite_code;
+                        if (data.entered_invite_code) {
+                            inviteText += "\nВведённый инвайт-код: " + data.entered_invite_code;
+                        }
+                        document.querySelector('#invite-code-display').textContent = inviteText;
                     } else {
                         alert(data.message);
                     }
@@ -86,6 +90,7 @@
                 });
             }
         }
+
     </script>
 </body>
 </html>
