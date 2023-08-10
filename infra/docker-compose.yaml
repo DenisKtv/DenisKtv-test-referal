@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  db:
+  db_api:
     image: postgres:13.0-alpine
     restart: always
     volumes:
@@ -19,7 +19,7 @@ services:
     env_file:
       - ./.env
 
-  nginx:
+  nginx_api:
     image: nginx:1.21.3-alpine
     restart: always
     ports:
