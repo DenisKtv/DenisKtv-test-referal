@@ -1,5 +1,6 @@
-from django.core.cache import cache
 import random
+
+from django.core.cache import cache
 
 
 class VerificationService:

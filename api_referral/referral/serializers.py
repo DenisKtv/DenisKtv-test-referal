@@ -1,7 +1,9 @@
-from rest_framework import serializers
-from .models import UserProfile
-from django.core.exceptions import ValidationError
 import re
+
+from django.core.exceptions import ValidationError
+from rest_framework import serializers
+
+from .models import UserProfile
 
 
 class SignUpSerializer(serializers.ModelSerializer):
