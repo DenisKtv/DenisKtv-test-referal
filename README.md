@@ -110,13 +110,13 @@ API документация доступна по ссылке (создана 
 [http://185.107.237.87:81/redoc/](http://185.107.237.87:81/redoc/)
 
 ## Примеры запросов:
-### http://185.107.237.87:81/signup/%
-<img src="1.png" alt="Alt text" title="Optional Title" width="200" />
-<img src="2.png" alt="Alt text" title="Optional Title" width="200" />
-<img src="1.1.png" alt="Alt text" title="Optional Title" width="300" />
-<img src="3.png" alt="Alt text" title="Optional Title" width="200" />
-<img src="1.2.png" alt="Alt text" title="Optional Title" width="300" />
-<img src="4.png" alt="Alt text" title="Optional Title" width="200" />
-<img src="1.3.png" alt="Alt text" title="Optional Title" width="300" />
-<img src="5.png" alt="Alt text" title="Optional Title" width="200" />
-<img src="1.4.png" alt="Alt text" title="Optional Title" width="300" />
+
+### http://185.107.237.87:81/signup/
+<img src="images/1.png" alt="Alt text" title="Optional Title" width="250" /> <img src="images/2.png" alt="Alt text" title="Optional Title" width="250" /> <img src="images/1.1.png" alt="Alt text" title="Optional Title" width="300" />
+
+### http://185.107.237.87:81/profile/
+<img src="images/3.png" alt="Alt text" title="Optional Title" width="300" /> <img src="images/1.2.png" alt="Alt text" title="Optional Title" width="300" />
+<img src="images/4.png" alt="Alt text" title="Optional Title" width="300" /> <img src="images/1.3.png" alt="Alt text" title="Optional Title" width="300" />
+
+### http://185.107.237.87:81/referrals?phone_number=299345233
+<img src="images/5.png" alt="Alt text" title="Optional Title" width="300" /> <img src="images/1.4.png" alt="Alt text" title="Optional Title" width="300" />
