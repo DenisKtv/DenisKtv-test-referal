@@ -113,10 +113,10 @@ API документация доступна по ссылке (создана 
 ### http://185.107.237.87:81/signup/%
 <img src="1.png" alt="Alt text" title="Optional Title" width="200" />
 <img src="2.png" alt="Alt text" title="Optional Title" width="200" />
-<img src="1.1.png" alt="Alt text" title="Optional Title" width="400" />
-<img src="3.png" alt="Alt text" title="Optional Title" width="400" />
-<img src="1.2.png" alt="Alt text" title="Optional Title" width="400" />
-<img src="4.png" alt="Alt text" title="Optional Title" width="400" />
-<img src="1.3.png" alt="Alt text" title="Optional Title" width="400" />
-<img src="5.png" alt="Alt text" title="Optional Title" width="400" />
-<img src="1.4.png" alt="Alt text" title="Optional Title" width="400" />
+<img src="1.1.png" alt="Alt text" title="Optional Title" width="300" />
+<img src="3.png" alt="Alt text" title="Optional Title" width="200" />
+<img src="1.2.png" alt="Alt text" title="Optional Title" width="300" />
+<img src="4.png" alt="Alt text" title="Optional Title" width="200" />
+<img src="1.3.png" alt="Alt text" title="Optional Title" width="300" />
+<img src="5.png" alt="Alt text" title="Optional Title" width="200" />
+<img src="1.4.png" alt="Alt text" title="Optional Title" width="300" />
