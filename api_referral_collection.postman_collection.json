@@ -1,0 +1,400 @@
+{
+	"info": {
+		"_postman_id": "5539322f-d2a4-49b6-8919-0dce7035bd69",
+		"name": "api_referral_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23353973"
+	},
+	"item": [
+		{
+			"name": "signup",
+			"item": [
+				{
+					"name": "get_verification_code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone_number\": \"291621530\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://185.107.237.87:81/signup/",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"signup",
+								""
+							]
+						},
+						"description": "Получаем верификационный код!"
+					},
+					"response": []
+				},
+				{
+					"name": "registration_or_authorization",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone_number\": \"291621530\",\n    \"verification_code\": 2038\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://185.107.237.87:81/signup/",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"signup",
+								""
+							]
+						},
+						"description": "Вводи получный код и в зависимости от того первый ли это наш заход на сайт, регистрируемся или авторизуемся! Жизнь верификационного кода 90сек!"
+					},
+					"response": []
+				},
+				{
+					"name": "Wrong_number_format",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone_number\": \"2916211sd20\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://185.107.237.87:81/signup/",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"signup",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "profile",
+			"item": [
+				{
+					"name": "error_this_number_dont_exist",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://185.107.237.87:81/profile?phone_number=295621530",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"profile"
+							],
+							"query": [
+								{
+									"key": "phone_number",
+									"value": "295621530"
+								}
+							]
+						},
+						"description": "данный номер не зарегестрирован"
+					},
+					"response": []
+				},
+				{
+					"name": "get_invite_code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://185.107.237.87:81/profile?phone_number=291621530",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"profile"
+							],
+							"query": [
+								{
+									"key": "phone_number",
+									"value": "291621530"
+								}
+							]
+						},
+						"description": "данный номер не зарегестрирован"
+					},
+					"response": []
+				},
+				{
+					"name": "get_your_invite_code_and_entered_code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://185.107.237.87:81/profile?phone_number=299345230",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"profile"
+							],
+							"query": [
+								{
+									"key": "phone_number",
+									"value": "299345230"
+								}
+							]
+						},
+						"description": "Получаем наш инвайт код, и если мы уже регестрировали код, то и введеный."
+					},
+					"response": []
+				},
+				{
+					"name": "add_referral_code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone_number\": \"299345233\",\n    \"invite_code\": \"07Bk35\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://185.107.237.87:81/profile/",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"profile",
+								""
+							]
+						},
+						"description": "Добавляем реферальный код."
+					},
+					"response": []
+				},
+				{
+					"name": "error_code_already_activate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone_number\": \"299345230\",\n    \"invite_code\": \"07Bk35\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://185.107.237.87:81/profile/",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"profile",
+								""
+							]
+						},
+						"description": "Ошибка, код уже активирован у этого аккаунта."
+					},
+					"response": []
+				},
+				{
+					"name": "error_cant_enter_your_code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone_number\": \"299345233\",\n    \"invite_code\": \"Zg68hm\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://185.107.237.87:81/profile/",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"profile",
+								""
+							]
+						},
+						"description": "Нельзя ввести свои код"
+					},
+					"response": []
+				},
+				{
+					"name": "error_code_doesnt_exist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone_number\": \"299345233\",\n    \"invite_code\": \"Bв2167\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://185.107.237.87:81/profile/",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"profile",
+								""
+							]
+						},
+						"description": "Нельзя ввести свои код"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "referrals",
+			"item": [
+				{
+					"name": "empty_list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://185.107.237.87:81/referrals?phone_number=299345230",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"referrals"
+							],
+							"query": [
+								{
+									"key": "phone_number",
+									"value": "299345230"
+								}
+							]
+						},
+						"description": "Кодом пользователя никто не пользовался."
+					},
+					"response": []
+				},
+				{
+					"name": "referrals_list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://185.107.237.87:81/referrals?phone_number=299345233",
+							"protocol": "http",
+							"host": [
+								"185",
+								"107",
+								"237",
+								"87"
+							],
+							"port": "81",
+							"path": [
+								"referrals"
+							],
+							"query": [
+								{
+									"key": "phone_number",
+									"value": "299345233"
+								}
+							]
+						},
+						"description": "Выводит список пользователей активировавших код!"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
